@@ -7,6 +7,9 @@ export default class AppHomeOpened extends Event {
     once = false;
     async execute({ event, client, say }: SlackEventMiddlewareArgs<"member_joined_channel"> & AllMiddlewareArgs<StringIndexed>) {
         try {
+
+            if (!process.env.SLACK_WELCOME_CHANNELS.includes(event.channel)) return;
+
             const user = await client.users.info({ user: event.user });
             if (!user.ok) return;
 

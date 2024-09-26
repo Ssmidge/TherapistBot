@@ -8,6 +8,7 @@ import MongoDatabase from "./types/database/mongo/MongoDatabase.mts";
 import { Mongoose } from "mongoose";
 import { ServerResponse } from 'http';
 import { ParamsIncomingMessage } from "@slack/bolt/dist/receivers/ParamsIncomingMessage.js";
+import CommandHandler from "./handlers/CommandHandler.mts";
 
 const boltApp = new Bolt.App({
     signingSecret: process.env.SLACK_BOT_SIGNING_SECRET,
@@ -23,6 +24,7 @@ const boltApp = new Bolt.App({
         "channels:read",
         "chat:write",
         "chat:write.customize",
+        "commands",
         "groups:history",
         "groups:read",
         "users:read",
@@ -45,6 +47,7 @@ const boltApp = new Bolt.App({
 });
 boltApp.events = new Map();
 boltApp.actions = new Map();
+boltApp.commands = new Map();
 
 // Connect to the DB
 
@@ -56,6 +59,7 @@ const handlers = [];
 
 handlers.push(new EventHandler(boltApp));
 handlers.push(new ActionHandler(boltApp));
+handlers.push(new CommandHandler(boltApp));
 
 await boltApp.start();
 
@@ -80,6 +84,8 @@ declare global {
             SLACK_BOT_CLIENT_SECRET: string;
             SLACK_BOT_STATE_SECRET: string;
             SLACK_PORT?: string;
+            SLACK_AUTHORIZED_USERS: string[];
+            SLACK_WELCOME_CHANNELS: string[];
 
             // Database
             DATABASE_MONGODB_URI: string;

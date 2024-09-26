@@ -1,4 +1,5 @@
-import { App as BoltApp, Context, RespondFn, SlashCommand } from "@slack/bolt";
+import { AllMiddlewareArgs, App as BoltApp, Context, RespondFn, SlackCommandMiddlewareArgs, SlashCommand } from "@slack/bolt";
+import { StringIndexed } from "@slack/bolt/dist/types/helpers.js";
 
 export default abstract class Command {
     name?: string;
@@ -31,7 +32,7 @@ export default abstract class Command {
         return this.commandArguments;
     }
 
-    abstract execute({ context, body, command }: { context: Context; body: SlashCommand; command: SlashCommand; }, args: Argument[], respond: RespondFn): Promise<void>;
+    abstract execute({ body, client, command, context, payload, respond }: Partial<SlackCommandMiddlewareArgs & AllMiddlewareArgs<StringIndexed>>, args: Argument[]): Promise<void>;
 }
 
 export type Argument = {
