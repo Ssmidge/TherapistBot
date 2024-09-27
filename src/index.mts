@@ -10,6 +10,7 @@ import { ServerResponse } from 'http';
 import { ParamsIncomingMessage } from "@slack/bolt/dist/receivers/ParamsIncomingMessage.js";
 import CommandHandler from "./handlers/CommandHandler.mts";
 
+export const installationStore = new MongoDBInstallationStore();
 const boltApp = new Bolt.App({
     signingSecret: process.env.SLACK_BOT_SIGNING_SECRET,
     socketMode: true,
@@ -18,7 +19,7 @@ const boltApp = new Bolt.App({
     clientId: process.env.SLACK_BOT_CLIENT_ID,
     clientSecret: process.env.SLACK_BOT_CLIENT_SECRET,
     stateSecret: process.env.SLACK_BOT_STATE_SECRET,
-    installationStore: new MongoDBInstallationStore(),
+    installationStore,
     scopes: [
         "channels:history",
         "channels:read",
@@ -28,10 +29,13 @@ const boltApp = new Bolt.App({
         "groups:history",
         "groups:read",
         "users:read",
+        "usergroups:read",
+        "usergroups:write",
     ],
     redirectUri: "https://localhost:3000/slack/redirect",
     installerOptions: {
         redirectUriPath: "/slack/redirect",
+        userScopes: ["admin.roles:read"],
     },
     port: process.env.SLACK_PORT ? parseInt(process.env.SLACK_PORT) : 3000,
     customRoutes: [
@@ -84,8 +88,9 @@ declare global {
             SLACK_BOT_CLIENT_SECRET: string;
             SLACK_BOT_STATE_SECRET: string;
             SLACK_PORT?: string;
-            SLACK_AUTHORIZED_USERS: string[];
+            SLACK_AUTHORIZED_USERS: string;
             SLACK_WELCOME_CHANNELS: string[];
+            SLACK_XOXD_TOKEN: string;
 
             // Database
             DATABASE_MONGODB_URI: string;
