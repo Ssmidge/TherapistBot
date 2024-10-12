@@ -1,6 +1,5 @@
 import type { StringIndexed } from "@slack/bolt/dist/types/helpers.d.ts";
 import { loadFiles } from "../functions/fileLoader.mts";
-import Event from "../types/slack/SlackEvent.mts";
 import Handler from "../types/slack/SlackHandler.mts";
 import { App as BoltApp, Middleware,  AllMiddlewareArgs, SlackCommandMiddlewareArgs } from "@slack/bolt";
 import Command, { Argument } from "../types/slack/SlackCommand.mts";

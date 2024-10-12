@@ -1,3 +1,6 @@
 node_modules
 .env
 pnpm-lock.yaml
+credentials.json
+token.json
+bun.lockb

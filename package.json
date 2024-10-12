@@ -21,10 +21,17 @@
   "dependencies": {
     "@slack/bolt": "^3.21.4",
     "@slack/oauth": "^3.0.1",
+    "@slack/web-api": "^7.5.0",
+    "@types/imap": "^0.8.40",
+    "@types/selenium-webdriver": "^4.1.26",
     "axios": "^1.7.7",
     "bun-types": "^1.1.29",
     "dotenv": "^16.4.5",
+    "form-data": "^4.0.0",
     "glob": "^11.0.0",
-    "mongoose": "^8.6.3"
+    "google-auth-library": "^9.14.1",
+    "googleapis": "^144.0.0",
+    "mongoose": "^8.6.3",
+    "selenium-webdriver": "^4.25.0"
   }
 }

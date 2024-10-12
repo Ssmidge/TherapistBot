@@ -35,7 +35,7 @@ const boltApp = new Bolt.App({
     redirectUri: "https://localhost:3000/slack/redirect",
     installerOptions: {
         redirectUriPath: "/slack/redirect",
-        userScopes: ["admin.roles:read"],
+        userScopes: ["groups:read", "channels:read", "chat:write", "links:write"],
     },
     port: process.env.SLACK_PORT ? parseInt(process.env.SLACK_PORT) : 3000,
     customRoutes: [
@@ -90,7 +90,7 @@ declare global {
             SLACK_PORT?: string;
             SLACK_AUTHORIZED_USERS: string;
             SLACK_WELCOME_CHANNELS: string[];
-            SLACK_XOXD_TOKEN: string;
+            GMAIL_API_CREDENTIALS: string;
 
             // Database
             DATABASE_MONGODB_URI: string;

@@ -1,12 +1,42 @@
-import { SlackEventMiddlewareArgs, AllMiddlewareArgs } from "@slack/bolt";
+import { SlackEventMiddlewareArgs, AllMiddlewareArgs, View } from "@slack/bolt";
 import Event from "../types/slack/SlackEvent.mts";
 import type { StringIndexed } from "@slack/bolt/dist/types/helpers.d.ts";
+import { installationStore } from "../index.mts";
 
 export default class AppHomeOpened extends Event {
     name = "app_home_opened";
     once = false;
-    async execute({ event, client }: SlackEventMiddlewareArgs<"app_home_opened"> & AllMiddlewareArgs<StringIndexed>) {
+    async execute({ event, client, context }: SlackEventMiddlewareArgs<"app_home_opened"> & AllMiddlewareArgs<StringIndexed>) {
         try {
+            const installation = await installationStore.fetchInstallation({ teamId: context.teamId, enterpriseId: context.enterpriseId, userId: context.userId, isEnterpriseInstall: context.isEnterpriseInstall });
+            if (installation.user?.id !== event.user) { 
+                client.views.publish({
+                    user_id: event.user,
+                    view: {
+                        type: "home",
+                        blocks: [
+                          {
+                            type: "section",
+                            text: {
+                              type: "mrkdwn",
+                              text: "Sadly, you haven't authenticated yet!"
+                            },
+                            accessory: {
+                              type: "button",
+                              text: {
+                                type: "plain_text",
+                                text: "Authenticate",
+                                emoji: true
+                              },
+                              value: "oauth_click_authenticate",
+                              url: "https://therapist.slack.ssmidge.xyz/slack/install",
+                              action_id: "button-action"
+                            }
+                          }
+                        ]
+                      },
+                });
+            } else
             client.views.publish({
                 user_id: event.user,
                 view: {

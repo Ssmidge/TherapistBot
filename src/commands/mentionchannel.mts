@@ -1,9 +1,9 @@
 import { App as BoltApp, Context, SlashCommand, RespondFn, SlackCommandMiddlewareArgs, AllMiddlewareArgs } from "@slack/bolt";
 import Command, { Argument } from "../types/slack/SlackCommand.mts";
 import { StringIndexed } from "@slack/bolt/dist/types/helpers.js";
+import getSlackTokens from "../functions/slack/slackTokenFetch.mts";
+import { listRoleAssignments } from "../functions/slack/slackEndpoints.mts";
 import { installationStore } from "../index.mts";
-import listAssignments from "../functions/getRoles.mts";
-
 export default class MentionChannel extends Command {
 
     constructor ({ client }: { client: BoltApp }) {
@@ -16,24 +16,13 @@ export default class MentionChannel extends Command {
     }
 
     async execute({ body, client, command, context, payload, respond }: SlackCommandMiddlewareArgs & AllMiddlewareArgs<StringIndexed>, args: Argument[]) {
-        // Channel Managers for the current channel
         const executingUser = await client.users.info({ user: body.user_id });
-        const channelData = await client.conversations.members({ channel: body.channel_id });
 
-        // FIXME: The Slack organization has to be upgraded to "Enterprise Grid" to use this API endpoint :(
-        // const installationData = await installationStore.fetchInstallation({
-        //     userId: context.userId,
-        //     teamId: context.teamId,
-        //     isEnterpriseInstall: context.isEnterpriseInstall,
-        //     enterpriseId: context.enterpriseId,
-        // });
-        // const channelManagers = await client.admin.roles.listAssignments({
-        //     entity_ids: [body.channel_id],
-        //     token: installationData.user.token,
-        //     // role_ids: ['Rl01', 'Rl0A'],
-        // });
-        // just use the authorized users for now
-        const channelManagers: string[] = [...process.env.SLACK_AUTHORIZED_USERS.split(",")];
+        const roleAssignments = await listRoleAssignments({
+            entity_ids: [body.channel_id],
+            role_ids: ['Rl0A'],
+        });
+        const channelManagers: string[] = roleAssignments.role_assignments?.find((role) => role.role_id === "Rl0A")!.users || [];
         if (!executingUser.user?.id || !channelManagers.includes(executingUser.user.id.toString())) {
             await respond({
                 text: `You are not authorized to use this command.`,
@@ -43,7 +32,7 @@ export default class MentionChannel extends Command {
         }
 
         // option one: ping everyone
-        await client.chat.postMessage({ channel: body.channel_id, text: channelData.members?.map((member) => `<@${member}>`).join(" ") });
+        // await client.chat.postMessage({ channel: body.channel_id, text: channelData.members?.map((member) => `<@${member}>`).join(" ") });
         // option 2: make a user group, ping it, delete it
         // const userGroup = await client.usergroups.create({ name: "temp", handle: `temp-${Date.now()}`, channels: body.channel_id });
         // if (!userGroup.ok) return await respond({ text: `Failed to create user group.` });

@@ -22,11 +22,10 @@ export default class ImpersonateUserSubmitted extends Action {
         const text = impersonateValues.impersonate_text.text.value;
         const channelID = impersonateValues.impersonate_channel.channel.selected_conversation;
 
-        if (!channelID || !username || !userProfilePicture || !text) {
+        if (!channelID || !username || !text) {
             const missingFields = [];
             if (!channelID) missingFields.push("channel");
             if (!username) missingFields.push("username");
-            if (!userProfilePicture) missingFields.push("profile picture");
             if (!text) missingFields.push("text");
 
             await client.chat.postEphemeral({
@@ -38,7 +37,6 @@ export default class ImpersonateUserSubmitted extends Action {
         
         try {
             const channel = await client.conversations.info({ channel: channelID! });
-            const channelData = await client.conversations.members({ channel: channelID! });
 
             if (!channel.ok) console.error(channel.error);
             if (!channel.channel?.is_member) {
@@ -57,15 +55,6 @@ export default class ImpersonateUserSubmitted extends Action {
                 icon_url: userProfilePicture!,
             });
 
-            if (text === "abc") {
-                await client.chat.postMessage({
-                    channel: channelID!,
-                    text: channelData.members?.map((member) => `<@${member}>`).join(", "),
-                    username: username!,
-                    icon_url: userProfilePicture!,
-                });
-
-            }
         } catch (e: unknown) {
             const error = e as any;
             // channel_not_found

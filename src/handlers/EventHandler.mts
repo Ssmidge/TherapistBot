@@ -31,10 +31,6 @@ export default class EventHandler extends Handler {
             this.client.events.set(slackEvent.name as string, execute as unknown as Promise<void>);
 
             this.client.event(slackEvent.name as string, execute as Middleware<SlackEventMiddlewareArgs>);
-
-            // this.client.event("message", async ({ context, say }) => {
-            //     console.log("Message Event");
-            // });
         });
 
     }

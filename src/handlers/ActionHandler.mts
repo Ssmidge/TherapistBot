@@ -1,6 +1,5 @@
 import type { StringIndexed } from "@slack/bolt/dist/types/helpers.d.ts";
 import { loadFiles } from "../functions/fileLoader.mts";
-import Event from "../types/slack/SlackEvent.mts";
 import Handler from "../types/slack/SlackHandler.mts";
 import { App as BoltApp, Middleware, SlackEventMiddlewareArgs, AllMiddlewareArgs, SlackActionMiddlewareArgs, SlackAction } from "@slack/bolt";
 import Action from "../types/slack/SlackAction.mts";
@@ -32,10 +31,6 @@ export default class ActionHandler extends Handler {
             this.client.actions.set(slackAction.id as string, execute as unknown as Promise<void>);
 
             this.client.action(slackAction.id as string, execute as Middleware<SlackActionMiddlewareArgs>);
-
-            // this.client.event("message", async ({ context, say }) => {
-            //     console.log("Message Event");
-            // });
         });
 
     }
